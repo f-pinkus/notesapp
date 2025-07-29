@@ -4,8 +4,11 @@ import {
   Text, 
   FlatList, 
   StyleSheet, 
-  SafeAreaView 
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import NoteForm from './components/NoteForm';
 
 export default function App() {
   const [notes, setNotes] = useState([
@@ -13,6 +16,13 @@ export default function App() {
     { id: 2, title: 'Note 2', body: 'This is the content of note 2' },
     { id: 3, title: 'Note 3', body: 'This is the content of note 3' },
   ]);
+
+  const [showForm, setShowForm] = useState(false);
+
+  const handleNoteCreated = (newNote) => {
+    setNotes([...notes, {...newNote, id: notes.length + 1 }]);
+    setShowForm(false);
+  };
 
   const renderNote = ({ item }) => (
     <View style={styles.noteCard}>
@@ -23,13 +33,28 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>All Notes ({notes.length})</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>All Notes ({notes.length})</Text>
+        <TouchableOpacity 
+          style={styles.addButton}
+          onPress={() => setShowForm(true)}
+        >
+          <Ionicons name="add" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
       <FlatList
         data={notes}
         renderItem={renderNote}
         keyExtractor={item => item.id.toString()}
         style={styles.list}
         showsVerticalScrollIndicator={false}
+      />
+
+      <NoteForm
+        visible={showForm}
+        onClose={() => setShowForm(false)}
+        onSuccess={handleNoteCreated}
       />
     </SafeAreaView>
   );
@@ -44,9 +69,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
     textAlign: 'center',
     color: '#333',
+    flex: 1,
   },
   list: {
     flex: 1,
@@ -75,5 +100,22 @@ const styles = StyleSheet.create({
   noteBody: {
     fontSize: 14,
     color: '#666',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  addButton: {
+    backgroundColor: '#007AFF',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 12,
   },
 });
